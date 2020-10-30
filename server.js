@@ -3,10 +3,6 @@ const app = express();
 var http = require('http').createServer(app);
 var io = require('socket.io')(http);
 
-app.get('/server', (req, res) => {
-  res.send('kubit is watching you...');
-});
-
 io.on('connection', (client) => {
   console.log('a user connected');
 
