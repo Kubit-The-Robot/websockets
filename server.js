@@ -1,19 +1,21 @@
 const express = require('express');
-const app = express();
-var http = require('http').createServer(app);
-var io = require('socket.io')(http);
+const http = require('http');
+const WebSocket = require('ws');
 
-io.on('connection', (client) => {
-  console.log('a user connected');
+const port = 6969;
+const server = http.createServer(express);
+const wss = new WebSocket.Server({ server })
 
-  client.on('chat', (data) => {
-    console.log('Message received -->', data);
-
-    io.emit('chat', data);
+wss.on('connection', function connection(ws) {
+  ws.on('message', function incoming(data) {
+    wss.clients.forEach(function each(client) {
+      if (client !== ws && client.readyState === WebSocket.OPEN) {
+        client.send(data);
+      }
+    })
   })
-});
+})
 
-// Now make our new WS server listen to port 5000
-io.listen(5000, () => {
-  console.log('Listening ... 🚀 ');
+server.listen(port, function() {
+  console.log(`Server is listening on ${port}!`)
 });
